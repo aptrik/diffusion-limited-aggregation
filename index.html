@@ -1,0 +1,57 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Diffusion-Limited aggregation</title>
+    <meta name="description" content="Diffusion-Limited aggregation">
+    <meta name="author" content="Patrik Berglund">
+    <link rel="stylesheet" type="text/css" media="screen" href="screen.css" />
+    <script type="text/javascript" language="javascript"
+            src="simulation.js"></script>
+    <script type="text/javascript" language="javascript">
+     const RATIO = 0.03;
+     const STEPS = 100;
+
+     var canvas;
+     var simulation;
+     var numberOfParticles, stuckParticles, stepsPerFrame;
+     var refreshIntervalId;
+
+     function init() {
+         var canvas = document.getElementById("board");
+         /* canvas.setAttribute("width", "800");
+          * canvas.setAttribute("height", "800");
+          */
+         simulation = new Simulation(
+             canvas.width, canvas.height, RATIO);
+
+         document.getElementById("number-of-particles").innerHTML = simulation.numberOfParticles;
+         document.getElementById("steps-per-frame").innerHTML = STEPS;
+         stuckParticles = document.getElementById("stuck-particles");
+
+         var update = function() {
+             var done = simulation.step(STEPS);
+             simulation.paint(canvas);
+             stuckParticles.innerHTML = simulation.stuckParticles.length;
+             if (done) {
+                 clearInterval(refreshIntervalId);
+             }
+         };
+
+         refreshIntervalId = setInterval(update, 1);
+     }
+
+     window.addEventListener("load", init, false);
+    </script>
+  </head>
+
+  <body>
+    <h1>Diffusion-limited aggregation</h1>
+    <figure>
+        <canvas id="board" width="500" height="500"></canvas>
+        <figcaption><span id="stuck-particles"></span>/<span id="number-of-particles"></span> stuck particles (<span id="steps-per-frame"></span> steps per frame)</figcaption>
+    </figure>
+  </body>
+</html>

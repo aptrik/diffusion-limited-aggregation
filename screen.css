@@ -1,0 +1,18 @@
+body {
+    background: #242323;
+    color: #fcd116;
+    font-size: 12px;
+    padding-left: 3em;
+    padding-right: 3em;
+}
+
+h1 {
+    font-size: 300%;
+}
+
+figure {
+    float: left;
+    text-align: center;
+    font-size: smaller;
+    /* border: 1px solid #fff; */
+}
