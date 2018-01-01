@@ -34,7 +34,26 @@ function Simulation(width, height, ratio) {
     for (var j = 0; j < this.particles.length; j++) {
         this.particles[j] = this.randomPosition();
     }
+
+    this.gradient = [
+        0x00F000,
+        0x28C800,
+        0x50A000,
+        0x787800,
+        0xA05000,
+        0xC82800,
+        0xF00000,
+    ];
 }
+
+Simulation.prototype.colourAt = function (steps) {
+    var maxSteps = this.steps;
+    var index = Math.floor((steps / maxSteps) * this.gradient.length) % this.gradient.length;
+    var colour = this.gradient[index];
+    return [(colour & 0xff0000) >> 16,
+            (colour & 0x00ff00) >> 8,
+            (colour & 0x0000ff)];
+};
 
 Simulation.prototype.gridIndex = function (x, y) {
     return x + y * this.width;
@@ -104,6 +123,10 @@ Simulation.prototype.move = function (position) {
     };
 };
 
+Simulation.prototype.isDone = function () {
+    return this.particles.length === 0;
+};
+
 Simulation.prototype.step = function (steps = 1) {
     if (!this.startTime) {
         this.startTime = performance.now();
@@ -125,14 +148,12 @@ Simulation.prototype.step = function (steps = 1) {
             break;
         }
     }
-    var done = this.particles.length === 0;
-    if (done) {
+    if (this.isDone()) {
         this.duration = (performance.now() - this.startTime) / 1000;
         console.log(
             "Simulation finished in %s steps after %.2f seconds.",
             this.steps, this.duration);
     }
-    return done;
 };
 
 Simulation.prototype.paint = function (canvas) {
@@ -147,14 +168,17 @@ Simulation.prototype.paint = function (canvas) {
         data[4 * index + 0] = 0x80;
         data[4 * index + 1] = 0x80;
         data[4 * index + 2] = 0x80;
-        data[4 * index + 3] = 0xff;
+        data[4 * index + 3] = 0xd0;
     }
+    var done = this.isDone();
+    var r, g, b;
     for (var j = 0; j < this.stuckParticles.length; j++) {
         particle = this.stuckParticles[j];
         index = this.gridIndex(particle.x, particle.y);
-        data[4 * index + 0] = 0x90;
-        data[4 * index + 1] = 0xff;
-        data[4 * index + 2] = 0x90;
+        [r, g, b] = done ? this.colourAt(this.grid[index]) : [0x00, 0xf0, 0x00];
+        data[4 * index + 0] = r;
+        data[4 * index + 1] = g;
+        data[4 * index + 2] = b;
         data[4 * index + 3] = 0xd0;
     }
     ctx.putImageData(imagedata, 0, 0);

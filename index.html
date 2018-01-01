@@ -32,11 +32,12 @@
          stuckParticles = document.getElementById("stuck-particles");
 
          var update = function() {
-             var done = simulation.step(STEPS);
+             simulation.step(STEPS);
              simulation.paint(canvas);
              stuckParticles.innerHTML = simulation.stuckParticles.length;
-             if (done) {
+             if (simulation.isDone()) {
                  clearInterval(refreshIntervalId);
+                 //simulation.paint(canvas);
              }
          };
 
